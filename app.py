@@ -105,41 +105,41 @@ if st.button('Entrenar modelos de regresión y mostrar resultados'):
     ### K-nearest Neighbours Regression:
     '''
     # knn regressor
-    knn_reg = KNeighborsRegressor(weights="distance")
-    param_knn = [{'n_neighbors': np.arange(10, 41, 5)}]
-    regressor_knn = GridSearchCV(estimator=knn_reg, param_grid=param_knn, n_jobs=-1, refit=True, cv=5)
-    regressor_knn.fit(xtrain_sc, ytrain)
-    st.write('Los mejores parámetros fueron: ' + str(regressor_knn.best_params_))
+    knn_reg = KNeighborsRegressor(weights="distance", n_neighbors=10)
+    # param_knn = [{'n_neighbors': np.arange(10, 41, 5)}]
+    # regressor_knn = GridSearchCV(estimator=knn_reg, param_grid=param_knn, n_jobs=-1, refit=True, cv=5)
+    knn_reg.fit(xtrain_sc, ytrain)
+    # st.write('Los mejores parámetros fueron: ' + str(regressor_knn.best_params_))
 
-    ypred_knnr = regressor_knn.predict(xtest_sc)
+    ypred_knnr = knn_reg.predict(xtest_sc)
     st.write('El error cuadrático medio es: ' + str(np.sqrt(mean_squared_error(ytest, ypred_knnr))))
 
     '''
     ### Support Vector Regression:
     '''
     # sv regressor
-    sv_reg = SVR()
-    param_svr = {'kernel': ['linear', 'rbf', 'sigmoid'], 'C': [1, 10], 'gamma': [0.01, 1]}
-    regressor_svr = GridSearchCV(estimator=sv_reg, param_grid=param_svr, n_jobs=-1, refit=True, cv=5)
-    regressor_svr.fit(xtrain_sc, ytrain)
-    st.write('Los mejores parámetros fueron: ' + str(regressor_svr.best_params_))
+    sv_reg = SVR(kernel='linear', C=10, gamma=0.01)
+    # param_svr = {'kernel': ['linear', 'rbf', 'sigmoid'], 'C': [1, 10], 'gamma': [0.01, 1]}
+    # regressor_svr = GridSearchCV(estimator=sv_reg, param_grid=param_svr, n_jobs=-1, refit=True, cv=5)
+    sv_reg.fit(xtrain_sc, ytrain)
+    # st.write('Los mejores parámetros fueron: ' + str(regressor_svr.best_params_))
 
-    ypred_svr = regressor_svr.predict(xtest_sc)
+    ypred_svr = sv_reg.predict(xtest_sc)
     st.write('El error cuadrático medio es: ' + str(np.sqrt(mean_squared_error(ytest, ypred_svr))))
 
     '''
     ### Random Forest Regression:
     '''
     # rf regressor
-    rf_reg = RandomForestRegressor()
-    param_rfr = {'n_estimators': [10, 200],
-                 'max_features': [0.5, 'sqrt', 'log2'],
-                 'min_samples_leaf': [1, 5]}
-    regressor_rf = GridSearchCV(estimator=rf_reg, param_grid=param_rfr, refit=True, cv=5)
-    regressor_rf.fit(xtrain, ytrain)
-    st.write('Los mejores parámetros fueron: ' + str(regressor_rf.best_params_))
+    rf_reg = RandomForestRegressor(max_features=0.5, min_samples_leaf=1, n_estimators=200)
+    # param_rfr = {'n_estimators': [10, 200],
+    #              'max_features': [0.5, 'sqrt', 'log2'],
+    #              'min_samples_leaf': [1, 5]}
+    # regressor_rf = GridSearchCV(estimator=rf_reg, param_grid=param_rfr, refit=True, cv=5)
+    rf_reg.fit(xtrain, ytrain)
+    # st.write('Los mejores parámetros fueron: ' + str(regressor_rf.best_params_))
 
-    ypred_rfr = regressor_rf.predict(xtest_sc)
+    ypred_rfr = rf_reg.predict(xtest_sc)
     st.write('El error cuadrático medio es: ' + str(np.sqrt(mean_squared_error(ytest, ypred_rfr))))
 
     ''' ### Diferencias entre ytest e ypredicted'''
