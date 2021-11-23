@@ -120,8 +120,6 @@ algo = col2.selectbox('Algorithm: ', ('ball_tree', 'kd_tree', 'brute'))
 
 # knn regressor
 knn_reg = KNeighborsRegressor(weights="distance", n_neighbors=neighbors, algorithm=algo)
-# param_knn = [{'n_neighbors': np.arange(10, 41, 5)}]
-# regressor_knn = GridSearchCV(estimator=knn_reg, param_grid=param_knn, n_jobs=-1, refit=True, cv=5)
 knn_reg.fit(xtrain_sc, ytrain)
 st.write('Los mejores parámetros fueron: ' + str(knn_reg.get_params()))
 
@@ -132,7 +130,7 @@ st.write('El error cuadrático medio es: ' + str(np.sqrt(mean_squared_error(ytes
 ### Support Vector Regression:
 '''
 col1, col2, col3 = st.columns(3)
-# kernel
+# c
 c = col1.number_input(
     'C:',
     min_value=10,
@@ -140,15 +138,13 @@ c = col1.number_input(
     value=16,
     step=1,
 )
-# c
+# kernel
 kernel = col2.selectbox('Kernel: ', ('poly', 'linear', 'rbf'))
 # gamma
 gamma = col3.selectbox('Gamma: ', ('scale', 'auto'))
 
 # sv regressor
 sv_reg = SVR(kernel=kernel, C=c, gamma=gamma, coef0=11, shrinking=False)
-# param_svr = {'kernel': ['linear', 'rbf', 'sigmoid'], 'C': [1, 10], 'gamma': [0.01, 1]}
-# regressor_svr = GridSearchCV(estimator=sv_reg, param_grid=param_svr, n_jobs=-1, refit=True, cv=5)
 sv_reg.fit(xtrain_sc, ytrain)
 st.write('Los mejores parámetros fueron: ' + str(sv_reg.get_params()))
 ypred_svr = sv_reg.predict(xtest_sc)
@@ -158,12 +154,27 @@ st.write('El error cuadrático medio es: ' + str(np.sqrt(mean_squared_error(ytes
 ### Random Forest Regression:
 '''
 
+col1, col2 = st.columns(2)
+# n estimators
+n_estim = col1.number_input(
+    'Number estimators:',
+    min_value=150,
+    max_value=250,
+    value=210,
+    step=10,
+)
+# max features
+max_feat = col2.number_input(
+    'Max features:',
+    min_value=0.1,
+    max_value=1.0,
+    value=0.7,
+    step=0.1,
+)
+
 # rf regressor
-rf_reg = RandomForestRegressor(max_features=0.5, min_samples_leaf=1, n_estimators=200)
-# param_rfr = {'n_estimators': [10, 200],
-#              'max_features': [0.5, 'sqrt', 'log2'],
-#              'min_samples_leaf': [1, 5]}
-# regressor_rf = GridSearchCV(estimator=rf_reg, param_grid=param_rfr, refit=True, cv=5)
+rf_reg = RandomForestRegressor(max_features=max_feat, min_samples_leaf=1, n_estimators=n_estim)
+
 rf_reg.fit(xtrain, ytrain)
 st.write('Los mejores parámetros fueron: ' + str(rf_reg.get_params()))
 
@@ -171,14 +182,20 @@ ypred_rfr = rf_reg.predict(xtest_sc)
 st.write('El error cuadrático medio es: ' + str(np.sqrt(mean_squared_error(ytest, ypred_rfr))))
 
 ''' ### Diferencias entre ytest e ypredicted'''
-fig1, ax = plt.subplots(1, 3, figsize=(20, 10))
-ax[0].plot(ytest - ypred_knnr, marker='o', linestyle='')
-ax[1].plot(ytest - ypred_svr, marker='o', linestyle='')
-ax[2].plot(ytest - ypred_rfr, marker='o', linestyle='')
+fig1, ax = plt.subplots(1, 3, figsize=(15, 5))
+ax[0].plot(ytest - ypred_knnr, marker='o', linestyle='', c='crimson')
+ax[0].set_title('KNN Regressor')
+ax[0].axhline(y=0, linestyle='-')
+ax[1].plot(ytest - ypred_svr, marker='o', linestyle='', c='crimson')
+ax[1].set_title('SV Regressor')
+ax[1].axhline(y=0, linestyle='-')
+ax[2].plot(ytest - ypred_rfr, marker='o', linestyle='', c='crimson')
+ax[2].set_title('RFR')
+ax[2].axhline(y=0, linestyle='-')
 st.pyplot(fig1)
 
 ''' ### Predicciones vs Valores reales'''
-fig2, ax = plt.subplots(1, 3, figsize=(14, 5))
+fig2, ax = plt.subplots(1, 3, figsize=(15, 5))
 ax[0].scatter(ytest, ypred_knnr)
 ax[0].plot(np.arange(np.max(ytest)), np.arange(np.max(ytest)), color='crimson', alpha=0.5)
 ax[0].set_title('KNN Regressor')
